@@ -1,6 +1,6 @@
 # ![MVC9 ICON](https://avatars1.githubusercontent.com/u/20783939?v=3&s=27) MVC9
 
-> [![licenseMIT](https://img.shields.io/github/license/mashape/apistatus.svg)](#license)　[![npm version](https://img.shields.io/npm/v/npm.svg)](https://www.npmjs.com)
+[![licenseMIT](https://img.shields.io/github/license/mashape/apistatus.svg)](#license)　[![npm version](https://img.shields.io/npm/v/npm.svg)](https://www.npmjs.com)
 
 > A light and handy framework for mobile website(web-app).
 
