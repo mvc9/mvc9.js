@@ -1,10 +1,8 @@
 # MVC9
 
 > A light and handy framework for mobile website(web-app).
-
+[![npm version](https://img.shields.io/npm/v/npm.svg)](https://www.npmjs.com)    [![npm version](https://img.shields.io/github/license/mashape/apistatus.svg)](#license)
 - [Website](http://www.mvc9.com)
-
-[![npm version](https://img.shields.io/npm/v/npm.svg)](https://www.npmjs.com)  [![npm version](https://img.shields.io/github/license/mashape/apistatus.svg)](#license)
 
 
 
