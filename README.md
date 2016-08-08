@@ -65,4 +65,4 @@ Maintained under the [Semantic Versioning guidelines](http://semver.org/).
 - [mvc9.js](https://github.com/mvc9/mvc9.js) by @mvc9.com
 
 
-[⬆ back to top](#table-of-contents)
+[↑ back to top](#table-of-contents)
