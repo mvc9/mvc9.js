@@ -1,0 +1,20 @@
+{
+  "name": "mvc9.js",
+  "description": "www.mvc9.com",
+  "author": "mvc9.com developers",
+  "version": "1.0.2",
+  "license": "MIT",
+  "repository": {
+    "type": "",
+    "url": ""
+  },
+  "main": "",
+  "dependencies": {
+    "gulp": "^3.9.1",
+    "gulp-connect": "^4.1.0",
+    "gulp-less": "^3.1.0",
+    "gulp-minify-css": "^1.2.4",
+    "gulp-uglify": "^1.5.3",
+    "gulp-watch": "^4.3.6"
+  }
+}
