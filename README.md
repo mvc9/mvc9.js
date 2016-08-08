@@ -1,7 +1,9 @@
 # MVC9
 
-> A light and handy framework for mobile website(web-app).
-[![npm version](https://img.shields.io/npm/v/npm.svg)](https://www.npmjs.com)    [![npm version](https://img.shields.io/github/license/mashape/apistatus.svg)](#license)
+> [![npm version](https://img.shields.io/npm/v/npm.svg)](https://www.npmjs.com)    [![npm version](https://img.shields.io/github/license/mashape/apistatus.svg)](#license)
+
+A light and handy framework for mobile website(web-app).
+
 - [Website](http://www.mvc9.com)
 
 
@@ -21,6 +23,7 @@
 MVC9 makes it incredibly easy to transfer varable to html.
 
 
+
 ## Getting started
 
 ### Quick start
@@ -32,6 +35,7 @@ Four quick start options are available:
 - Install with [NPM](http://npmjs.org): `npm install`.
 - Run with [gulp](http://gulpjs.com/): `gulp`.
 - Open link in your browser: `127.0.0.1:90`.
+
 
 ## Browser support
 
@@ -52,7 +56,7 @@ Maintained under the [Semantic Versioning guidelines](http://semver.org/).
 
 ## License
 
-[MIT](http://opensource.org/licenses/MIT) © [mvc9](http://www.mvc9.com)
+[MIT](https://github.com/mvc9/mvc9.js/blob/master/LICENSE) © [mvc9.com](http://www.mvc9.com)
 
 
 
