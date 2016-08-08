@@ -13,9 +13,9 @@ var connect = require('gulp-connect');
 //是否执行开发模式编译;=true不会压缩js/css;
 var developmentMode = false;
 //开发源路径根目录
-var developRoot = "./app_develop";
+var developRoot = "./mvc9_develop";
 //编译发布路径根目录
-var releaseRoot = "./app_build";
+var releaseRoot = "./mvc9_build";
 
 var config = {
 	//LESS开发源路径
