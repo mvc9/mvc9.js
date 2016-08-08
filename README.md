@@ -18,8 +18,7 @@
 
 ## Main
 
-```
-## Introduction
+### Introduction
 
 MVC9 makes it incredibly easy to transfer varable to html.
 
