@@ -90,11 +90,11 @@ gulp.task('watch', function() {
 	watch(config.jsSrc, function() { //监视所有js
 		gulp.start('js'); //出现修改立即执行js任务
 	});
-	watch(config.htmlSrc, function() { //监视所有js
-		gulp.start('html'); //出现修改立即执行js任务
+	watch(config.htmlSrc, function() { //监视所有html
+		gulp.start('html'); //出现修改立即执行html任务
 	});
 	watch(config.srcSrc, function() { //监视所有src
-		gulp.start('src'); //出现修改立即执行js任务
+		gulp.start('src'); //出现修改立即执行src任务
 	});
 	watch(developRoot + '/*.*', function() { //监视根目录源
 		gulp.start('index'); //出现修改立即执行js任务
