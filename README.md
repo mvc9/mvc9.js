@@ -45,25 +45,26 @@ Four quick start options are available:
 > mvc9.js
 > ------
 > | Browser				| version		|
-> | --------				| -----			|
-> |- [x]  Chrome				| latest		|
-> |- [x]  Firefox				| latest		|
-> |- [x]  Safari				| latest		|
-> |- [x]  Opera					| latest		|
-> |- [x]  Windows Edge			| latest		|
-> |- [x]  Internet Explorer		| 5.5 +			|
+> | --------			| -----			|
+> | Chrome				| latest		|
+> | Firefox				| latest		|
+> | Safari				| latest		|
+> | Opera				| latest		|
+> | Windows Edge		| latest		|
+> | Internet Explorer	| 5.5 +			|
 
-------
+###
+
 > mvc9.applicationShell.js
 > ------
 > | Browser				| version		|
-> | --------				| -----			|
-> |- [x]  Chrome				| latest		|
-> |- [x]  Firefox				| latest		|
-> |- [x]  Safari				| latest		|
-> |- [x]  Opera					| latest		|
-> |- [x]  Windows Edge			| latest		|
-> |- [x]  Internet Explorer		| 9.0 +			|
+> | --------			| -----			|
+> | Chrome				| latest		|
+> | Firefox				| latest		|
+> | Safari				| latest		|
+> | Opera				| latest		|
+> | Windows Edge		| latest		|
+> | Internet Explorer	| 5.5 +			|
 
 
 
