@@ -25,6 +25,12 @@
 			<ul mvc-repeat="model.array">
 				<li>{{model.array[$0]}}</li>
 			</ul>
+			<ul mvc-repeat="model.array">
+				<li>{{model.array[$0]}}</li>
+			</ul>
+			<ul mvc-repeat="model.array">
+				<li>{{model.array[$0]}}</li>
+			</ul>
 		</div>
 		<br />
 		part4:
@@ -36,7 +42,7 @@
 						<li>
 							<span>country: {{model.object[$0].country[$1].countryName}}</span>
 							<ul mvc-repeat="model.object[$0].country[$1].city">
-								<li onclick="appEvent.clickCity($0,$1,$2)">{{model.object[$0].country[$1].city[$2]}}</li>
+								<li onclick="appEvent.clickCity($0,$1,$2)" style="cursor:pointer">{{model.object[$0].country[$1].city[$2]}}</li>
 							</ul>
 						</li>
 					</ul>

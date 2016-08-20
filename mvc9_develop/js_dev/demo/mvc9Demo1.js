@@ -73,11 +73,9 @@ $mvc.onload(function() {
 	//event
 	window.appEvent = {};
 	appEvent.clickCity = function(a, b, c) {
-		console.log(
-			model.object[a].continent+' '+
-			model.object[a].country[b].countryName+' '+
-			model.object[a].country[b].city[c]
-		);
+		var message=model.object[a].continent+' '+model.object[a].country[b].countryName+' '+model.object[a].country[b].city[c];
+		$mvc.console('log',message,'#ff0099');
+		alert(message);
 	}
 
 	// 以下是懒人专用(不传参数默认读取body节点作为模板编译)

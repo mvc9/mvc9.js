@@ -16,6 +16,8 @@
   - [Versioning](#versioning)
   - [License](#license)
 
+
+
 ## Main
 
 ### Introduction
@@ -34,17 +36,41 @@ Four quick start options are available:
 - Clone the repository: `https://github.com/mvc9/mvc9.js.git`.
 - Install with [NPM](http://npmjs.org): `npm install`.
 - Run with [gulp](http://gulpjs.com/): `gulp`.
-- Open link in your browser: `127.0.0.1:90`.
+- Open link in your browser: `127.0.0.1:1090`.
+
 
 
 ## Browser support
 
-- Chrome (latest)
-- Firefox (latest)
-- Safari (latest)
-- Opera (latest)
-- Edge (latest)
-- Internet Explorer 5+
+&nbsp;
+&nbsp;
+
+> mvc9.js
+> ------
+> | Browser				| version		|
+> | --------			| -----			|
+> | Chrome				| latest		|
+> | Firefox				| latest		|
+> | Safari				| latest		|
+> | Opera				| latest		|
+> | Windows Edge		| latest		|
+> | Internet Explorer	| 5.5 +			|
+
+&nbsp;
+&nbsp;
+
+> mvc9.route.js
+> ------
+> | Browser				| version		|
+> | --------			| -----			|
+> | Chrome				| latest		|
+> | Firefox				| latest		|
+> | Safari				| latest		|
+> | Opera				| latest		|
+> | Windows Edge		| latest		|
+> | Internet Explorer	| 9.0 +			|
+
+### &nbsp;
 
 
 

@@ -1,6 +1,6 @@
 /*
  *	mvc9 demo - gulpfile.js
- *	http://localhost:90/
+ *	http://localhost:1090/
  */
 
 var gulp = require('gulp');
@@ -11,10 +11,10 @@ var watch = require('gulp-watch');
 var connect = require('gulp-connect');
 
 //是否执行开发模式编译;=true不会压缩js/css;
-var developmentMode = false;
+var developmentMode = true;
 //开发源路径根目录
 var developRoot = "./mvc9_develop";
-//编译发布路径根目录
+//项目编译路径根目录
 var releaseRoot = "./mvc9_build";
 
 var config = {
@@ -41,7 +41,7 @@ var config = {
 	//开发环境本地web服务根目录路径
 	"webServerRoot": releaseRoot,
 	//开发环境本地web服务端口
-	"webServerPort": "90"
+	"webServerPort": "1090"
 }
 
 gulp.task('less', function() {
