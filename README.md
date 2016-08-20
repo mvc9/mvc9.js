@@ -59,7 +59,7 @@ Four quick start options are available:
 &nbsp;
 &nbsp;
 
-> mvc9.router.js
+> mvc9.route.js
 > ------
 > | Browser				| version		|
 > | --------			| -----			|
