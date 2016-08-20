@@ -53,7 +53,8 @@ Four quick start options are available:
 > | Windows Edge		| latest		|
 > | Internet Explorer	| 5.5 +			|
 
-###
+### 
+### 
 
 > mvc9.applicationShell.js
 > ------
