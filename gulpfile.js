@@ -14,7 +14,7 @@ var connect = require('gulp-connect');
 var developmentMode = true;
 //开发源路径根目录
 var developRoot = "./mvc9_develop";
-//编译发布路径根目录
+//项目编译路径根目录
 var releaseRoot = "./mvc9_build";
 
 var config = {
