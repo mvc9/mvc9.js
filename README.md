@@ -42,6 +42,8 @@ Four quick start options are available:
 
 ## Browser support
 
+### &nbsp;
+
 > mvc9.js
 > ------
 > | Browser				| version		|
@@ -53,8 +55,7 @@ Four quick start options are available:
 > | Windows Edge		| latest		|
 > | Internet Explorer	| 5.5 +			|
 
-### - &nbsp;
-### - 
+### &nbsp;
 
 > mvc9.applicationShell.js
 > ------
