@@ -16,6 +16,8 @@
   - [Versioning](#versioning)
   - [License](#license)
 
+
+
 ## Main
 
 ### Introduction
@@ -37,23 +39,31 @@ Four quick start options are available:
 - Open link in your browser: `127.0.0.1:1090`.
 
 
+
 ## Browser support
 
-### mvc9.js
-| Browser				| version		|
-| --------				| -----			|
-| [x]Chrome				| latest		|
-| [x]Firefox				| latest		|
-| [x]Safari				| latest		|
-| [x]Opera					| latest		|
-| [x]Windows Edge			| latest		|
-| [x]Internet Explorer		| 5.5+			|
->>- Chrome (latest)
->>- Firefox (latest)
->>- Safari (latest)
->>- Opera (latest)
->>- Edge (latest)
->>- Internet Explorer 5.5 +
+> mvc9.js
+> ------
+> | Browser				| version		|
+> | --------				| -----			|
+> |- [x]  Chrome				| latest		|
+> |- [x]  Firefox				| latest		|
+> |- [x]  Safari				| latest		|
+> |- [x]  Opera					| latest		|
+> |- [x]  Windows Edge			| latest		|
+> |- [x]  Internet Explorer		| 5.5 +			|
+
+------
+> mvc9.applicationShell.js
+> ------
+> | Browser				| version		|
+> | --------				| -----			|
+> |- [x]  Chrome				| latest		|
+> |- [x]  Firefox				| latest		|
+> |- [x]  Safari				| latest		|
+> |- [x]  Opera					| latest		|
+> |- [x]  Windows Edge			| latest		|
+> |- [x]  Internet Explorer		| 9.0 +			|
 
 
 
