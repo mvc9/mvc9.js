@@ -39,7 +39,15 @@ Four quick start options are available:
 
 ## Browser support
 
-> mvc9.js
+### mvc9.js
+| Browser				| version		|
+| --------				| -----			|
+| [x]Chrome				| latest		|
+| [x]Firefox				| latest		|
+| [x]Safari				| latest		|
+| [x]Opera					| latest		|
+| [x]Windows Edge			| latest		|
+| [x]Internet Explorer		| 5.5+			|
 >>- Chrome (latest)
 >>- Firefox (latest)
 >>- Safari (latest)
