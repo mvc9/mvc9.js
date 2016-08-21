@@ -56,19 +56,6 @@ Four quick start options are available:
 > | Windows Edge		| latest		|
 > | Internet Explorer	| 5.5 +			|
 
-&nbsp;
-&nbsp;
-
-> mvc9.route.js
-> ------
-> | Browser				| version		|
-> | --------			| -----			|
-> | Chrome				| latest		|
-> | Firefox				| latest		|
-> | Safari				| latest		|
-> | Opera				| latest		|
-> | Windows Edge		| latest		|
-> | Internet Explorer	| 9.0 +			|
 
 ### &nbsp;
 
