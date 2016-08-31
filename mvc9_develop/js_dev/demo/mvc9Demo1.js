@@ -2,25 +2,22 @@ $mvc.onload(function() {
 
 	window.view = {};
 	window.model = {};
-	$mvc.debug = true;
+	$mvc.mode='dev';
 
 
 	//给 part1 的{{变量}}标记赋值
 	model.string1 = 'Hello! MVC9.';
-	//以id="part1"的元素为根节点初始化模板(返回一个$mvc模板变量，存在view.part1里)
-	view.part1 = $mvc.mapNode.model(document.getElementById('part1'));
-	//执行模板编译(编译一个$mvc模板)
-	view.part1 = $mvc.mapNode.compile(view.part1); //╮(╯▽╰)╭完了，三步搞定！
 
 	//part2
 	model.number = 100;
-	view.part2 = $mvc.mapNode.model(document.getElementById('part2'));
-	view.part2 = $mvc.mapNode.compile(view.part2);
 
 	//part3
-	model.array = ['Asia', 'America', 'Europe'];
-	view.part3 = $mvc.mapNode.model(document.getElementById('part3'));
-	view.part3 = $mvc.mapNode.compile(view.part3);
+	model.array = ['loading...'];
+	setTimeout(function(){
+		model.array = ['Asia', 'America', 'Europe'];
+		//异步操作更新数据之后使用以下方法编译模板
+		$mvc.mapNode.compile('example3');
+	},2000);
 
 
 	//part4
@@ -67,8 +64,6 @@ $mvc.onload(function() {
 			]
 		}]
 	}]
-	view.part4 = $mvc.mapNode.model(document.getElementById('part4'));
-	view.part4 = $mvc.mapNode.compile(view.part4);
 
 	//event
 	window.appEvent = {};
@@ -78,7 +73,4 @@ $mvc.onload(function() {
 		alert(message);
 	}
 
-	// 以下是懒人专用(不传参数默认读取body节点作为模板编译)
-	// $mvc.mapNode.model();
-	// $mvc.mapNode.compile();
 });
