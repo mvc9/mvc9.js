@@ -11,30 +11,24 @@
 <body>
 	<div class="mainrect" style="font-family:helvetical;font-size:15px;color:#555;padding:10px;">
 		<br />
-		<div id="part1">
+		<div mvc-template="example1">
 			part1:{{model.string1}}
 		</div>
 		<br />
-		<div id="part2">
+		<div mvc-template="example2">
 			part2:{{model.number+100+model.number*3}}
 		</div>
 		<br />
 		part3:
-		<div id="part3" class="repeat1">
+		<div mvc-template="example3" class="repeat1">
 			<!-- mvc-repeat 不能直接作为模板父元素，必须套个div什么的才行╮(╯▽╰)╭ -->
-			<ul mvc-repeat="model.array">
-				<li>{{model.array[$0]}}</li>
-			</ul>
-			<ul mvc-repeat="model.array">
-				<li>{{model.array[$0]}}</li>
-			</ul>
 			<ul mvc-repeat="model.array">
 				<li>{{model.array[$0]}}</li>
 			</ul>
 		</div>
 		<br />
 		part4:
-		<div id="part4">
+		<div mvc-template="example4">
 			<ul mvc-repeat="model.object">
 				<li>
 					<span>continent: {{model.object[$0].continent}}</span>
