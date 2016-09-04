@@ -6,7 +6,7 @@ $mvc.onload(function() {
 
 
 	//给 part1 的{{变量}}标记赋值
-	model.string1 = 'Hello! MVC9.';
+	model.string1 = '<a>Hello! MVC9.</a>';
 
 	//part2
 	model.number = 100;
