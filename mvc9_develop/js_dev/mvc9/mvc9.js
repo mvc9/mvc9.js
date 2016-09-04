@@ -49,6 +49,120 @@
         }
     }
 
+    /*=====  Single Ajax  =====*/
+    $mvc.sAjaxSequence = [];
+    /*  @description single AJAX request.
+     *  @param {Object} param
+     *  @return {Object} param
+     *  @example
+     *  var param={
+     *      "name":'request1',
+     *      "url":'www.mvc9.com/api/1',
+     *      "method":'GET',
+     *      "header":{"name":'mvc9', "value":'hello'},
+     *      "async":true,
+     *      "contentType":'application/json',
+     *      "content":{"message":'Hello content!'},
+     *      "crackCallback":function(name) {*your code*},
+     *      "delay":100(ms){after request finished 100ms,unlock this requset.},
+     *      "finishCallback":function(status, response) {*your code*}
+     *  };
+     *  $mvc.sAjax(param);
+     */
+    $mvc.sAjax = function(param) {
+        param = {
+            "name": param.name || 'null',
+            "crackCallback": param.crackCallback || function(name) { console.warn('sAjax(name:' + name + ') is canceled because of an unfinished same sAjax!'); },
+            "url": param.url || window.location.href,
+            "method": param.method || 'GET',
+            "header": param.header || [],
+            "contentType": param.contentType || 'application/x-www-form-urlencoded',
+            "content": param.content || '',
+            "async": !!param.async || true,
+            "delay": param.delay || 100,
+            "finishCallback": param.finishCallback || function() {}
+        }
+        param.header.push({
+            "name": 'Content-Type',
+            "value": param.contentType
+        });
+        if (param.contentType.match(/application\/x-www-form-urlencoded/g)) {
+            param.header.push({
+                "name": 'X-Requested-With',
+                "value": 'XMLHttpRequest'
+            });
+            if (typeof(param.content) == 'object') {
+                var formStr = '';
+                for (var key in param.content) {
+                    if (formStr) {
+                        formStr = formStr + '&' + encodeURIComponent(key) + '=' + encodeURIComponent(param.content[key]);
+                    } else {
+                        formStr = encodeURIComponent(key) + '=' + encodeURIComponent(param.content[key]);
+                    }
+                }
+                param.content = formStr;
+            }
+        } else {
+            if (JSON) {
+                if (typeof(param.content) == 'object') {
+                    param.content = JSON.stringify(param.content);
+                }
+            }
+        }
+        if (!param.name) {
+            console.error('$mvc.sAjax param.name can not be omitted!');
+            return;
+        } else {
+            for (var m = 0; m < $mvc.sAjaxSequence.length; m++) {
+                if ($mvc.sAjaxSequence[m] == param.name) {
+                    param.crackCallback(param.name);
+                    return;
+                }
+            }
+            $mvc.sAjaxSequence.push(param.name);
+        }
+        var xmlHttp = null;
+        xmlHttp = GetXmlHttpObject();
+        if (xmlHttp == null) {
+            alert("Your brower dose not support AJAX!");
+            return;
+        }
+        xmlHttp.onreadystatechange = stateChanged;
+        xmlHttp.open(param.method, param.url, param.async);
+        for (var n = 0; n < param.header.length; n++) {
+            xmlHttp.setRequestHeader(param.header[n].name, param.header[n].value);
+        }
+        xmlHttp.send(param.content);
+        return param;
+
+        function stateChanged() {
+            if (xmlHttp.readyState == 4) {
+                for (var i = 0; i < $mvc.sAjaxSequence.length; i++) {
+                    setTimeout(function() {
+                        $mvc.sAjaxSequence = $mvc.sAjaxSequence.slice(0, (i - 1)).concat($mvc.sAjaxSequence.slice(i, ($mvc.sAjaxSequence.length - 1)));
+                    }, param.delay);
+                }
+                param.finishCallback(xmlHttp.status, xmlHttp.responseText);
+            }
+        }
+
+        function GetXmlHttpObject() {
+            var xmlHttpFunction = null;
+            try {
+                // Webkit,Firefox,Opera8.0+,Safari
+                xmlHttpFunction = new XMLHttpRequest();
+            } catch (e) {
+                // Internet Explorer
+                try {
+                    xmlHttpFunction = new ActiveXObject("Msxml2.XMLHTTP");
+                } catch (e) {
+                    xmlHttpFunction = new ActiveXObject("Microsoft.XMLHTTP");
+                }
+            }
+            return xmlHttpFunction;
+        }
+    }
+
     /*  @description window.onload event
      *  @param {Function} fn
      */
@@ -77,7 +191,7 @@
 
     /*=====  Map Node MVC  =====*/
     $mvc.regex = {};
-    $mvc.regex.NodeMark = new RegExp('{{[^(}})]*}}', 'g');
+    $mvc.regex.NodeMark = new RegExp('{{2,3}[^{}]*}{2,3}', 'g');
     $mvc.mapNode = {};
     $mvc.mapNode.Molds = {};
 
@@ -100,12 +214,13 @@
             }
             return matchNodes;
         }
-        /*  @decscription
-         *
-         */
+    /*  @decscription auto make mvc-template into a mold;
+    *    Caution:this function will clear all mold you have make!
+    */
     $mvc.mapNode.autoMold = function() {
+        $mvc.mapNode.Molds=[];
         var mvcTemplateNodes = $mvc.mapNode.getElementsByAttributeName('mvc-template');
-        for(var n=0;n<mvcTemplateNodes.length;n++){
+        for (var n = 0; n < mvcTemplateNodes.length; n++) {
             $mvc.mapNode.Mold(mvcTemplateNodes[n].attributes['mvc-template']['value'], mvcTemplateNodes[n]);
         }
     }
@@ -226,13 +341,22 @@
     function compileNodeMarks(nodeData) {
         var htmlStr = nodeData.node.innerHTML;
         var mapedMarks = nodeData.nodeMarks;
+        var mark3LRegex = new RegExp('{{{');
+        var mark3RRegex = new RegExp('}}}');
+        var markFixRegex = [new RegExp('{', 'g'), new RegExp('}', 'g'), new RegExp('=""', 'g'), new RegExp('<', 'g'), new RegExp('>', 'g')];
         var tempMark;
+        var tempStr;
+        var isTrueElement;
         for (var i = 0; i < mapedMarks.length; i++) {
-            tempMark = mapedMarks[i].replace(/({{)/g, '');
-            tempMark = tempMark.replace(/(}})/g, '');
-            tempMark = tempMark.replace(/^(="")/g, '');
+            isTrueElement = mark3LRegex.test(mapedMarks[i]) && mark3RRegex.test(mapedMarks[i]);
+            tempMark = mapedMarks[i].replace(markFixRegex[0], '');
+            tempMark = tempMark.replace(markFixRegex[1], '');
+            tempMark = tempMark.replace(markFixRegex[2], '');
             if (eval('typeof(' + tempMark + ')') != 'undefined') {
-                htmlStr = htmlStr.replace(mapedMarks[i], eval(tempMark));
+                tempStr = String(eval(tempMark));
+                isTrueElement ? null : tempStr = tempStr.replace(markFixRegex[3], '&#60;');
+                isTrueElement ? null : tempStr = tempStr.replace(markFixRegex[4], '&#62;');
+                htmlStr = htmlStr.replace(mapedMarks[i], tempStr);
             } else {
                 htmlStr = htmlStr.replace(mapedMarks[i], '');
             }
@@ -242,117 +366,5 @@
     };
 
 
-    /*=====  Single Ajax  =====*/
-    $mvc.sAjaxSequence = [];
-    /*  @description single AJAX request.
-     *  @param {Object} param
-     *  @return {Object} param
-     *  @example
-     *  var param={
-     *      "name":'request1',
-     *      "url":'www.mvc9.com/api/1',
-     *      "method":'GET',
-     *      "header":{"name":'mvc9', "value":'hello'},
-     *      "async":true,
-     *      "contentType":'application/json',
-     *      "content":{"message":'Hello content!'},
-     *      "crackCallback":function(name) {*your code*},
-     *      "delay":100(ms){after request finished 100ms,unlock this requset.},
-     *      "finishCallback":function(status, response) {*your code*}
-     *  };
-     *  $mvc.sAjax(param);
-     */
-    $mvc.sAjax = function(param) {
-        param = {
-            "name": param.name || 'null',
-            "crackCallback": param.crackCallback || function(name) { console.warn('sAjax(name:' + name + ') is canceled because of an unfinished same sAjax!'); },
-            "url": param.url || window.location.href,
-            "method": param.method || 'GET',
-            "header": param.header || [],
-            "contentType": param.contentType || 'application/x-www-form-urlencoded',
-            "content": param.content || '',
-            "async": !!param.async || true,
-            "delay": param.delay || 100,
-            "finishCallback": param.finishCallback || function() {}
-        }
-        param.header.push({
-            "name": 'Content-Type',
-            "value": param.contentType
-        });
-        if (param.contentType.match(/application\/x-www-form-urlencoded/g)) {
-            param.header.push({
-                "name": 'X-Requested-With',
-                "value": 'XMLHttpRequest'
-            });
-            if (typeof(param.content) == 'object') {
-                var formStr = '';
-                for (var key in param.content) {
-                    if (formStr) {
-                        formStr = formStr + '&' + encodeURIComponent(key) + '=' + encodeURIComponent(param.content[key]);
-                    } else {
-                        formStr = encodeURIComponent(key) + '=' + encodeURIComponent(param.content[key]);
-                    }
-                }
-                param.content = formStr;
-            }
-        } else {
-            if (JSON) {
-                if (typeof(param.content) == 'object') {
-                    param.content = JSON.stringify(param.content);
-                }
-            }
-        }
-        if (!param.name) {
-            console.error('$mvc.sAjax param.name can not be omitted!');
-            return;
-        } else {
-            for (var m = 0; m < $mvc.sAjaxSequence.length; m++) {
-                if ($mvc.sAjaxSequence[m] == param.name) {
-                    param.crackCallback(param.name);
-                    return;
-                }
-            }
-            $mvc.sAjaxSequence.push(param.name);
-        }
-        var xmlHttp = null;
-        xmlHttp = GetXmlHttpObject();
-        if (xmlHttp == null) {
-            alert("Your brower dose not support AJAX!");
-            return;
-        }
-        xmlHttp.onreadystatechange = stateChanged;
-        xmlHttp.open(param.method, param.url, param.async);
-        for (var n = 0; n < param.header.length; n++) {
-            xmlHttp.setRequestHeader(param.header[n].name, param.header[n].value);
-        }
-        xmlHttp.send(param.content);
-        return param;
 
-        function stateChanged() {
-            if (xmlHttp.readyState == 4) {
-                for (var i = 0; i < $mvc.sAjaxSequence.length; i++) {
-                    setTimeout(function() {
-                        $mvc.sAjaxSequence = $mvc.sAjaxSequence.slice(0, (i - 1)).concat($mvc.sAjaxSequence.slice(i, ($mvc.sAjaxSequence.length - 1)));
-                    }, param.delay);
-                }
-                param.finishCallback(xmlHttp.status, xmlHttp.responseText);
-            }
-        }
-
-        function GetXmlHttpObject() {
-            var xmlHttpFunction = null;
-            try {
-                // Webkit,Firefox,Opera8.0+,Safari
-                xmlHttpFunction = new XMLHttpRequest();
-            } catch (e) {
-                // Internet Explorer
-                try {
-                    xmlHttpFunction = new ActiveXObject("Msxml2.XMLHTTP");
-                } catch (e) {
-                    xmlHttpFunction = new ActiveXObject("Microsoft.XMLHTTP");
-                }
-            }
-            return xmlHttpFunction;
-        }
-    }
 })();
