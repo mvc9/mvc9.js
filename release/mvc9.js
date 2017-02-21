@@ -1,7 +1,7 @@
 (function() {
     'use strict';
     /* init $mvc object */
-    window.$mvc = window.$mvc || { "name": "MVC9", "version": "1.0.1", "mode": 'dev' };
+    window.$mvc = window.$mvc || { "name": "MVC9", "version": "1.1.0", "mode": 'formal' };
     /*  @description display console messages when mode=dev;
      *  @param {String} command log,time,timeEnd,group,groupEnd
      *  @param {String} message log message or group name
@@ -18,14 +18,14 @@
                         console.timeEnd(message);
                         break;
                     case 'group':
-                        color = color || '#000';
+                        color = color || '#666';
                         console.group('%c' + message, 'color:' + color);
                         break;
                     case 'groupEnd':
                         console.groupEnd(message);
                         break;
                     case 'log':
-                        color = color || '#555';
+                        color = color || '#111';
                         console.log('%c' + message, 'color:' + color);
                         break;
                     case 'warn':
@@ -48,135 +48,6 @@
             }
         }
     }
-
-    /*  @description window.onload event
-     *  @param {Function} fn
-     */
-    $mvc.onload = function(fn) {
-        window.onload = function() {
-            fn();
-        }
-    };
-
-    /*=====  Map Node MVC  =====*/
-    $mvc.regex = {};
-    $mvc.regex.NodeMark = new RegExp('{{[^(}})]*}}', 'g');
-    $mvc.mapNode = {};
-    /*  @description Generate a marked html dom into a mvcNodeModel.
-     *  @param {Node} HTMLCollection
-     *  @return {Object} mvcNodeModel
-     */
-    $mvc.mapNode.model = function(node) {
-        node = node || document.body;
-        $mvc.mapNode.memoryNode = {
-            "node": node,
-            "nodeMarks": [],
-            "nodeRepeats": [],
-            "sourceHTML": node.innerHTML
-        }
-        return $mvc.mapNode.memoryNode;
-    };
-    /*  @description Restore a compiled mvcNodeModel into marked html.
-     *  @param {Object} mvcNodeModel
-     *  @return {Object} mvcNodeModel
-     */
-    $mvc.mapNode.restore = function(nodeData) {
-        nodeData.nodeMarks = [];
-        nodeData.nodeRepeats = [];
-        nodeData.node.innerHTML = nodeData.sourceHTML;
-        return nodeData;
-    };
-    /*  @description Compile a mvcNodeModel by reading window.* varable.
-     *  @param {Object} mvcNodeModel
-     *  @return {Object} mvcNodeModel
-     */
-    $mvc.mapNode.compile = function(nodeData) {
-        nodeData = nodeData || $mvc.mapNode.memoryNode;
-        $mvc.console('group', '$mvc compile');
-        $mvc.console('log', 'Model Element LocalName : ' + nodeData.node.localName);
-        nodeData.node.id ? $mvc.console('log', 'Model Element Id : ' + nodeData.node.id) : null;
-        nodeData.node.className ? $mvc.console('log', 'Model Element Class : ' + nodeData.node.className) : null;
-        $mvc.console('time', 'Elapsed Time');
-        $mvc.mapNode.restore(nodeData);
-        nodeData = filtRepeatNode(nodeData);
-        nodeData = filtNodeMarks(nodeData);
-        nodeData = compileNodeMarks(nodeData);
-        $mvc.mapNode.memoryNode = nodeData;
-        $mvc.console('timeEnd', 'Elapsed Time');
-        $mvc.console('groupEnd', '$mvc compile');
-        return nodeData;
-    };
-
-    function filtRepeatNode(nodeData) {
-        mapChildFindRepeat(nodeData.node, 0);
-
-        function mapChildFindRepeat(node, tier) {
-            //map current node child
-            for (var i = 0; i < node.childNodes.length; i++) {
-                //if this child is not a text
-                if (node.childNodes[i].attributes) {
-                    //map current child attribute
-                    for (var n = 0; n < node.childNodes[i].attributes.length; n++) {
-                        //if this attribute has object.nodeName
-                        if (node.childNodes[i].attributes[n].nodeName) {
-                            //if current node's current attribute is 'mvc-repeat'
-                            if (node.childNodes[i].attributes[n].nodeName == 'mvc-repeat') {
-                                var tierRegExp = new RegExp('\\$' + tier, 'g');
-                                var tempRepeat = {
-                                    "repeatMark": node.childNodes[i].attributes[n].nodeValue,
-                                    "repeatHTML": node.childNodes[i].innerHTML,
-                                    "repeatTier": tier
-                                };
-                                nodeData.nodeRepeats.push(tempRepeat);
-                                var repeatTimes = 0;
-                                var compileHTML = '';
-                                if (eval('typeof(' + tempRepeat.repeatMark + ')') == 'object') {
-                                    for (repeatTimes; repeatTimes < eval(tempRepeat.repeatMark + '.length'); repeatTimes++) {
-                                        var tempHTML = tempRepeat.repeatHTML;
-                                        tempHTML = tempHTML.replace(tierRegExp, repeatTimes);
-                                        compileHTML = compileHTML + tempHTML;
-                                    }
-                                } else {
-                                    $mvc.debug ? console.warn(tempRepeat.repeatMark + ' is not Array!') : null;
-                                }
-                                node.childNodes[i].innerHTML = compileHTML;
-                                mapChildFindRepeat(node.childNodes[i], tier + 1);
-                                break;
-                            }
-                        }
-                    }
-                    if (n == node.childNodes[i].attributes.length) {
-                        mapChildFindRepeat(node.childNodes[i], tier);
-                    }
-                }
-            }
-        }
-        return nodeData;
-    };
-
-    function filtNodeMarks(nodeData) {
-        nodeData.nodeMarks = nodeData.node.innerHTML.match($mvc.regex.NodeMark) || [];
-        return nodeData;
-    }
-
-    function compileNodeMarks(nodeData) {
-        var htmlStr = nodeData.node.innerHTML;
-        var mapedMarks = nodeData.nodeMarks;
-        var tempMark;
-        for (var i = 0; i < mapedMarks.length; i++) {
-            tempMark = mapedMarks[i].replace(/({{)/g, '');
-            tempMark = tempMark.replace(/(}})/g, '');
-            tempMark = tempMark.replace(/^(="")/g, '');
-            if (eval('typeof(' + tempMark + ')') != 'undefined') {
-                htmlStr = htmlStr.replace(mapedMarks[i], eval(tempMark));
-            } else {
-                htmlStr = htmlStr.replace(mapedMarks[i], '');
-            }
-        }
-        nodeData.node.innerHTML = htmlStr;
-        return nodeData;
-    };
-
 
     /*=====  Single Ajax  =====*/
     $mvc.sAjaxSequence = [];
@@ -291,4 +162,209 @@
             return xmlHttpFunction;
         }
     }
+
+    /*  @description window.onload event
+     *  @param {Function} fn
+     */
+    $mvc.onload = function(fn, doCompile) {
+        doCompile == undefined ? doCompile = true : null;
+        if (window.addEventListener) {
+            window.addEventListener('load', function(e) {
+                afterLoadFn();
+            });
+        } else {
+            window.attachEvent('onload', function(e) {
+                afterLoadFn();
+            });
+        }
+
+        function afterLoadFn() {
+            fn();
+            if (doCompile) {
+                $mvc.mapNode.autoMold();
+                for (var key in $mvc.mapNode.Molds) {
+                    compile(key, $mvc.mapNode.Molds[key]);
+                }
+            }
+        }
+    };
+
+    /*=====  Map Node MVC  =====*/
+    $mvc.regex = {};
+    $mvc.regex.NodeMark = new RegExp('{{2,3}[^{}]*}{2,3}', 'g');
+    $mvc.mapNode = {};
+    $mvc.mapNode.Molds = {};
+
+    $mvc.mapNode.getElementsByAttributeName = function(AttributeName) {
+            var allNode = document.getElementsByTagName('*');
+            var matchNodes = [];
+            for (var i = 0; i < allNode.length; i++) {
+                //if this child is not a text
+                if (allNode[i].attributes) {
+                    for (var n = 0; n < allNode[i].attributes.length; n++) {
+                        //if this attribute has object.nodeName
+                        if (allNode[i].attributes[n].nodeName) {
+                            //if current node's current attribute is 'mvc-template'
+                            if (allNode[i].attributes[n].nodeName == AttributeName) {
+                                matchNodes.push(allNode[i]);
+                            }
+                        }
+                    }
+                }
+            }
+            return matchNodes;
+        }
+        /*  @decscription auto make mvc-template into a mold;
+         *    Caution:this function will clear all mold you have make!
+         */
+    $mvc.mapNode.autoMold = function() {
+        $mvc.mapNode.Molds = [];
+        var mvcTemplateNodes = $mvc.mapNode.getElementsByAttributeName('mvc-template');
+        for (var n = 0; n < mvcTemplateNodes.length; n++) {
+            $mvc.mapNode.Mold(mvcTemplateNodes[n].attributes['mvc-template']['value'], mvcTemplateNodes[n]);
+        }
+    }
+
+    /*  @description Generate a marked html dom into a mvcNodeMold.
+     *  @param {Node} HTMLCollection
+     *  @return {Object} mvcNodeMold
+     */
+    $mvc.mapNode.Mold = function(name, node) {
+        var memoryNode;
+        node = node || document.body;
+        memoryNode = {
+            "node": node,
+            "nodeMarks": [],
+            "nodeRepeats": [],
+            "sourceHTML": node.innerHTML
+        }
+        $mvc.mapNode.Molds[name] = memoryNode;
+    };
+
+    /*  @description Restore a compiled mvcNodeMold into marked html.
+     *  @param {Object} mvcNodeMold
+     *  @return {Object} mvcNodeMold
+     */
+    $mvc.mapNode.restore = function(templateName) {
+        restore($mvc.mapNode.Molds[templateName]);
+    }
+
+    function restore(nodeData) {
+        nodeData.nodeMarks = [];
+        nodeData.nodeRepeats = [];
+        nodeData.node.innerHTML = nodeData.sourceHTML;
+        return nodeData;
+    };
+
+    /*  @description Compile a mvcNodeMold by reading window.* varable.
+     *  @param {Object} mvcNodeMold
+     *  @return {Object} mvcNodeMold
+     */
+    $mvc.mapNode.compile = function(templateName) {
+        if ($mvc.mapNode.Molds[templateName]) {
+            compile(templateName, $mvc.mapNode.Molds[templateName]);
+        } else {
+            console.warn('cannot find template mold by attribute mvc-template="' + templateName + '"');
+        }
+    }
+
+    function compile(name, nodeData) {
+        $mvc.console('group', '$mvc compile');
+        $mvc.console('log', 'Template Name : ' + name, '#33f');
+        $mvc.console('log', 'Template Element TagName : ' + nodeData.node.localName, '#69f');
+        nodeData.node.id ? $mvc.console('log', 'Template Element Id : ' + nodeData.node.id, '#69f') : null;
+        nodeData.node.className ? $mvc.console('log', 'Template Element Class : ' + nodeData.node.className, '#69f') : null;
+        $mvc.console('time', 'Elapsed Time');
+        $mvc.mapNode.restore(name, nodeData);
+        nodeData = filtRepeatNode(nodeData);
+        nodeData = filtNodeMarks(nodeData);
+        nodeData = compileNodeMarks(nodeData);
+        $mvc.console('log', 'Template Repeats : ' + nodeData.nodeRepeats.length, '#69f');
+        $mvc.console('log', 'Template Marks : ' + nodeData.nodeMarks.length, '#69f');
+        $mvc.console('timeEnd', 'Elapsed Time');
+        $mvc.console('groupEnd', '$mvc compile');
+        return nodeData;
+    };
+
+    function filtRepeatNode(nodeData) {
+        mapChildFindRepeat(nodeData.node, 0);
+
+        function mapChildFindRepeat(node, tier) {
+            //map current node child
+            for (var i = 0; i < node.childNodes.length; i++) {
+                //if this child is not a text
+                if (node.childNodes[i].attributes) {
+                    //map current child attribute
+                    for (var n = 0; n < node.childNodes[i].attributes.length; n++) {
+                        //if this attribute has object.nodeName
+                        if (node.childNodes[i].attributes[n].nodeName) {
+                            //if current node's current attribute is 'mvc-repeat'
+                            if (node.childNodes[i].attributes[n].nodeName == 'mvc-repeat') {
+                                var tierRegExp = new RegExp('\\$' + tier, 'g');
+                                var tempRepeat = {
+                                    "repeatMark": node.childNodes[i].attributes[n].nodeValue,
+                                    "repeatHTML": node.childNodes[i].innerHTML,
+                                    "repeatTier": tier
+                                };
+                                nodeData.nodeRepeats.push(tempRepeat);
+                                var repeatTimes = 0;
+                                var compileHTML = '';
+                                if (eval('typeof(' + tempRepeat.repeatMark + ')') == 'object') {
+                                    for (repeatTimes; repeatTimes < eval(tempRepeat.repeatMark + '.length'); repeatTimes++) {
+                                        var tempHTML = tempRepeat.repeatHTML;
+                                        tempHTML = tempHTML.replace(tierRegExp, repeatTimes);
+                                        compileHTML = compileHTML + tempHTML;
+                                    }
+                                } else {
+                                    $mvc.debug ? console.warn(tempRepeat.repeatMark + ' is not Array!') : null;
+                                }
+                                node.childNodes[i].innerHTML = compileHTML;
+                                mapChildFindRepeat(node.childNodes[i], tier + 1);
+                                break;
+                            }
+                        }
+                    }
+                    if (n == node.childNodes[i].attributes.length) {
+                        mapChildFindRepeat(node.childNodes[i], tier);
+                    }
+                }
+            }
+        }
+        return nodeData;
+    };
+
+    function filtNodeMarks(nodeData) {
+        nodeData.nodeMarks = nodeData.node.innerHTML.match($mvc.regex.NodeMark) || [];
+        return nodeData;
+    }
+
+    function compileNodeMarks(nodeData) {
+        var htmlStr = nodeData.node.innerHTML;
+        var mapedMarks = nodeData.nodeMarks;
+        var mark3LRegex = new RegExp('{{{');
+        var mark3RRegex = new RegExp('}}}');
+        var markFixRegex = [new RegExp('{', 'g'), new RegExp('}', 'g'), new RegExp('=""', 'g'), new RegExp('<', 'g'), new RegExp('>', 'g')];
+        var tempMark;
+        var tempStr;
+        var isTrueElement;
+        for (var i = 0; i < mapedMarks.length; i++) {
+            isTrueElement = mark3LRegex.test(mapedMarks[i]) && mark3RRegex.test(mapedMarks[i]);
+            tempMark = mapedMarks[i].replace(markFixRegex[0], '');
+            tempMark = tempMark.replace(markFixRegex[1], '');
+            tempMark = tempMark.replace(markFixRegex[2], '');
+            if (eval('typeof(' + tempMark + ')') != 'undefined') {
+                tempStr = String(eval(tempMark));
+                isTrueElement ? null : tempStr = tempStr.replace(markFixRegex[3], '&#60;');
+                isTrueElement ? null : tempStr = tempStr.replace(markFixRegex[4], '&#62;');
+                htmlStr = htmlStr.replace(mapedMarks[i], tempStr);
+            } else {
+                htmlStr = htmlStr.replace(mapedMarks[i], '');
+            }
+        }
+        nodeData.node.innerHTML = htmlStr;
+        return nodeData;
+    };
+
+
+
 })();

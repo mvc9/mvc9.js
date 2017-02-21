@@ -1,8 +1,14 @@
 (function() {
     'use strict';
     /* init $mvc object */
-    window.$mvc = window.$mvc || { "name": "MVC9", "version": "1.1.0", "mode": 'formal' };
-    /*  @description display console messages when mode=dev;
+    var $mvc = {
+        "name": "MVC9",
+        "version": "1.0.0 Beta",
+        "m": { "description": "Model Data Property" },
+        "v": { "description": "View Template Property" },
+        "c": { "description": "Control Property" }
+    };
+    /*  @description display console messages when $mvc.mode='dev';
      *  @param {String} command log,time,timeEnd,group,groupEnd
      *  @param {String} message log message or group name
      *  @param {String} color style color
@@ -54,42 +60,40 @@
     /*  @description single AJAX request.
      *  @param {Object} param
      *  @return {Object} param
-     *  @example
-     *  var param={
-     *      "name":'request1',
-     *      "url":'www.mvc9.com/api/1',
-     *      "method":'GET',
-     *      "header":{"name":'mvc9', "value":'hello'},
-     *      "async":true,
-     *      "contentType":'application/json',
-     *      "content":{"message":'Hello content!'},
-     *      "crackCallback":function(name) {*your code*},
-     *      "delay":100(ms){after request finished 100ms,unlock this requset.},
-     *      "finishCallback":function(status, response) {*your code*}
-     *  };
+     *
+     *  *** how to use $mvc.sAjax ***
+     *
+     *  var param = { * "name": 'request1',
+     *      "url": 'www.mvc9.com/api/1',
+     *      "method": 'GET',
+     *      "header": { "framework": "mvc9" },
+     *      "async": true,
+     *      "contentType": 'application/json',
+     *      "content": { "message": 'Hello content!' },
+     *      "crackCallback": function(name) { * your code * },
+     *      "delay": 100 // (ms) { after request finished 100 ms, unlock this requset. },
+     *      "finishCallback": function(status, response) { * your code * } *
+     *  }; 
      *  $mvc.sAjax(param);
      */
+
     $mvc.sAjax = function(param) {
         param = {
             "name": param.name || 'null',
             "crackCallback": param.crackCallback || function(name) { console.warn('sAjax(name:' + name + ') is canceled because of an unfinished same sAjax!'); },
             "url": param.url || window.location.href,
             "method": param.method || 'GET',
-            "header": param.header || [],
+            "header": param.header || {},
             "contentType": param.contentType || 'application/x-www-form-urlencoded',
             "content": param.content || '',
             "async": !!param.async || true,
             "delay": param.delay || 100,
             "finishCallback": param.finishCallback || function() {}
         }
-        param.header.push({
-            "name": 'Content-Type',
-            "value": param.contentType
-        });
+        param.header['Content-Type'] = param.contentType;
         if (param.contentType.match(/application\/x-www-form-urlencoded/g)) {
             param.header.push({
-                "name": 'X-Requested-With',
-                "value": 'XMLHttpRequest'
+                "X-Requested-With": "XMLHttpRequest"
             });
             if (typeof(param.content) == 'object') {
                 var formStr = '';
@@ -129,8 +133,8 @@
         }
         xmlHttp.onreadystatechange = stateChanged;
         xmlHttp.open(param.method, param.url, param.async);
-        for (var n = 0; n < param.header.length; n++) {
-            xmlHttp.setRequestHeader(param.header[n].name, param.header[n].value);
+        for (var key in param.header) {
+            xmlHttp.setRequestHeader(key, param.header[key]);
         }
         xmlHttp.send(param.content);
         return param;
@@ -166,7 +170,8 @@
     /*  @description window.onload event
      *  @param {Function} fn
      */
-    $mvc.onload = function(fn) {
+    $mvc.onload = function(fn, doCompile) {
+        doCompile == undefined ? doCompile = true : null;
         if (window.addEventListener) {
             window.addEventListener('load', function(e) {
                 afterLoadFn();
@@ -179,13 +184,12 @@
 
         function afterLoadFn() {
             fn();
-            $mvc.console('group', '$mvc boot');
-            $mvc.console('log', '$mvc init compile:', '#f96');
-            $mvc.mapNode.autoMold();
-            for (var key in $mvc.mapNode.Molds) {
-                compile(key, $mvc.mapNode.Molds[key]);
+            if (doCompile) {
+                $mvc.mapNode.autoMold();
+                for (var key in $mvc.mapNode.Molds) {
+                    compile(key, $mvc.mapNode.Molds[key]);
+                }
             }
-            $mvc.console('groupEnd', '$mvc boot');
         }
     };
 
@@ -214,11 +218,11 @@
             }
             return matchNodes;
         }
-    /*  @decscription auto make mvc-template into a mold;
-    *    Caution:this function will clear all mold you have make!
-    */
+        /*  @decscription auto make mvc-template into a mold;
+         *    Caution:this function will clear all mold you have make!
+         */
     $mvc.mapNode.autoMold = function() {
-        $mvc.mapNode.Molds=[];
+        $mvc.mapNode.Molds = [];
         var mvcTemplateNodes = $mvc.mapNode.getElementsByAttributeName('mvc-template');
         for (var n = 0; n < mvcTemplateNodes.length; n++) {
             $mvc.mapNode.Mold(mvcTemplateNodes[n].attributes['mvc-template']['value'], mvcTemplateNodes[n]);
@@ -365,6 +369,13 @@
         return nodeData;
     };
 
-
-
+    function EXPORTS() {
+        if (typeof(window) !== undefined) {
+            var Global = window;
+        } else {
+            var Global = global;
+        }
+        Global.$mvc = $mvc;
+    }
+    EXPORTS();
 })();
