@@ -1,8 +1,9 @@
+$mvc.mode='dev';
+$mvc.route.appVersion='1.12.1';
 $mvc.onload(function() {
 
 	window.view = {};
 	window.model = {};
-	$mvc.mode='dev';
 
 
 	//给 part1 的{{变量}}标记赋值

@@ -5,18 +5,20 @@
 	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
 	<title>MVC9 Demo</title>
 	<script src="/script/mvc9/mvc9.js"></script>
+	<script src="/script/mvc9/mvc9.route.js"></script>
 	<script src="/script/demo/mvc9Demo1.js"></script>
 </head>
 
 <body>
 	<div class="mainrect" style="font-family:helvetical;font-size:15px;color:#555;padding:10px;">
+		<button onclick="location.hash='/'+String(Math.random()).split('.')[1]+'/'+String(Math.random()).split('.')[1]+'/'+String(Math.random()).split('.')[1]">Change Hash</button>
 		<br />
 		<div mvc-template="example1">
 			part1:<br>{{model.string1}}<br>{{{model.string1}}}
 		</div>
 		<br />
 		<div mvc-template="example2">
-			part2:<br>{{model.number+100+model.number*3}}
+			part2:<br>{{model.number+100+model.number*3}}<br>{{String(Math.random()).split('.')[1]}}
 		</div>
 		<br />
 		part3:
