@@ -1,0 +1,35 @@
+body {
+  background-color: #111;
+  color: #36f036;
+  font-family: helvetica, Arial;
+}
+* {
+  cursor: default;
+}
+.main-rect {
+  padding: 20px;
+}
+.main-rect .box {
+  padding: 20px;
+  margin: 20px 0;
+  border: 1px dashed #464646;
+}
+.main-rect .box .part {
+  font-size: 16px;
+}
+.main-rect .box .content {
+  padding: 20px;
+  margin: 5px 0;
+  font-size: 14px;
+  background-color: #222;
+}
+.main-rect .box .content button {
+  border-radius: 3px;
+  padding: 3px;
+  margin: 3px;
+  background-color: #33c933;
+  border: none;
+}
+.main-rect .box .content button:hover {
+  background-color: #33e933;
+}
