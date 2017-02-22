@@ -1,20 +1,28 @@
-(function() {
+(function(top) {
     'use strict';
+
     /* init $mvc object */
+    var root = {};
     var $mvc = {
-        "name": "MVC9",
-        "version": "1.0.0 Beta",
-        "m": { "description": "Model Data Property" },
-        "v": { "description": "View Template Property" },
-        "c": { "description": "Control Property" }
+        "name": "mvc9.js(mvc9.com)",
+        "version": "0.9.1 Beta",
+        "logLevel": 0
     };
+    $mvc.isNodeRuntime = !Boolean(top.location);
+    $mvc.isNodeRuntime ? root = global : root = window;
+    root.m = { "description": "Model Data Property" };
+    root.v = { "description": "View Template Property" };
+    root.c = { "description": "Control Property" };
+    $mvc.root = root;
+
     /*  @description display console messages when $mvc.mode='dev';
      *  @param {String} command log,time,timeEnd,group,groupEnd
      *  @param {String} message log message or group name
      *  @param {String} color style color
      */
-    $mvc.console = function(command, message, color) {
-        if ($mvc.mode == 'dev') {
+    $mvc.console = function(command, message, color, logLevel) {
+        logLevel = logLevel || 1;
+        if ($mvc.logLevel >= logLevel) {
             if (console.time) {
                 switch (command) {
                     case 'time':
@@ -171,16 +179,7 @@
      *  @param {Function} fn
      */
     $mvc.onload = function(fn, doCompile) {
-        doCompile == undefined ? doCompile = true : null;
-        if (window.addEventListener) {
-            window.addEventListener('load', function(e) {
-                afterLoadFn();
-            });
-        } else {
-            window.attachEvent('onload', function(e) {
-                afterLoadFn();
-            });
-        }
+        doCompile == doCompile || false;
 
         function afterLoadFn() {
             fn();
@@ -191,6 +190,16 @@
                 }
             }
         }
+
+        if (window.addEventListener) {
+            window.addEventListener('load', function(e) {
+                afterLoadFn();
+            });
+        } else {
+            window.attachEvent('onload', function(e) {
+                afterLoadFn();
+            });
+        }
     };
 
     /*=====  Map Node MVC  =====*/
@@ -199,31 +208,33 @@
     $mvc.mapNode = {};
     $mvc.mapNode.Molds = {};
 
-    $mvc.mapNode.getElementsByAttributeName = function(AttributeName) {
-            var allNode = document.getElementsByTagName('*');
-            var matchNodes = [];
-            for (var i = 0; i < allNode.length; i++) {
-                //if this child is not a text
-                if (allNode[i].attributes) {
-                    for (var n = 0; n < allNode[i].attributes.length; n++) {
-                        //if this attribute has object.nodeName
-                        if (allNode[i].attributes[n].nodeName) {
-                            //if current node's current attribute is 'mvc-template'
-                            if (allNode[i].attributes[n].nodeName == AttributeName) {
-                                matchNodes.push(allNode[i]);
-                            }
+    $mvc.mapNode.getElementsByAttributeName = function(node, AttributeName) {
+        node = node || document;
+        var allNodes = node.getElementsByTagName('*');
+        var matchNodes = [];
+        for (var i = 0; i < allNodes.length; i++) {
+            //if this child is not a text
+            if (allNodes[i].attributes) {
+                for (var n = 0; n < allNodes[i].attributes.length; n++) {
+                    //if this attribute has object.nodeName
+                    if (allNodes[i].attributes[n].nodeName) {
+                        //if current node's current attribute is 'mvc-template'
+                        if (allNodes[i].attributes[n].nodeName == AttributeName) {
+                            matchNodes.push(allNodes[i]);
                         }
                     }
                 }
             }
-            return matchNodes;
         }
-        /*  @decscription auto make mvc-template into a mold;
-         *    Caution:this function will clear all mold you have make!
-         */
-    $mvc.mapNode.autoMold = function() {
+        return matchNodes;
+    }
+
+    /*  @decscription auto make mvc-template into a mold;
+     *    Caution:this function will clear all mold you have make!
+     */
+    $mvc.mapNode.autoMold = function(node) {
         $mvc.mapNode.Molds = [];
-        var mvcTemplateNodes = $mvc.mapNode.getElementsByAttributeName('mvc-template');
+        var mvcTemplateNodes = $mvc.mapNode.getElementsByAttributeName(node, 'mvc-template');
         for (var n = 0; n < mvcTemplateNodes.length; n++) {
             $mvc.mapNode.Mold(mvcTemplateNodes[n].attributes['mvc-template']['value'], mvcTemplateNodes[n]);
         }
@@ -233,16 +244,20 @@
      *  @param {Node} HTMLCollection
      *  @return {Object} mvcNodeMold
      */
-    $mvc.mapNode.Mold = function(name, node) {
+    $mvc.mapNode.Mold = function(name, node, beforeCompile, afterCompile) {
         var memoryNode;
-        node = node || document.body;
-        memoryNode = {
-            "node": node,
-            "nodeMarks": [],
-            "nodeRepeats": [],
-            "sourceHTML": node.innerHTML
+        if (name) {
+            node = node || document.body;
+            memoryNode = {
+                "node": node,
+                "nodeMarks": [],
+                "nodeRepeats": [],
+                "sourceHTML": node.innerHTML,
+                "beforeCompile": beforeCompile,
+                "afterCompile": afterCompile
+            }
+            $mvc.mapNode.Molds[name] = memoryNode;
         }
-        $mvc.mapNode.Molds[name] = memoryNode;
     };
 
     /*  @description Restore a compiled mvcNodeMold into marked html.
@@ -266,27 +281,31 @@
      */
     $mvc.mapNode.compile = function(templateName) {
         if ($mvc.mapNode.Molds[templateName]) {
-            compile(templateName, $mvc.mapNode.Molds[templateName]);
+            $mvc.mapNode.Molds[templateName].beforeCompile ? $mvc.mapNode.Molds[templateName].beforeCompile() : null;
+            var compiledNode = compile(templateName, $mvc.mapNode.Molds[templateName]);
+            $mvc.mapNode.Molds[templateName].afterCompile ? $mvc.mapNode.Molds[templateName].afterCompile() : null;
+            return compiledNode;
         } else {
-            console.warn('cannot find template mold by attribute mvc-template="' + templateName + '"');
+            console.warn('cannot find template mold by templateName "' + templateName + '"');
+            return {};
         }
     }
 
     function compile(name, nodeData) {
-        $mvc.console('group', '$mvc compile');
-        $mvc.console('log', 'Template Name : ' + name, '#33f');
-        $mvc.console('log', 'Template Element TagName : ' + nodeData.node.localName, '#69f');
-        nodeData.node.id ? $mvc.console('log', 'Template Element Id : ' + nodeData.node.id, '#69f') : null;
-        nodeData.node.className ? $mvc.console('log', 'Template Element Class : ' + nodeData.node.className, '#69f') : null;
+        $mvc.console('group', '$mvc compile', 5);
+        $mvc.console('log', 'Template Name : ' + name, '#33f', 5);
+        $mvc.console('log', 'Template Element TagName : ' + nodeData.node.localName, '#69f', 5);
+        nodeData.node.id ? $mvc.console('log', 'Template Element Id : ' + nodeData.node.id, '#69f', 5) : null;
+        nodeData.node.className ? $mvc.console('log', 'Template Element Class : ' + nodeData.node.className, '#69f', 5) : null;
         $mvc.console('time', 'Elapsed Time');
         $mvc.mapNode.restore(name, nodeData);
         nodeData = filtRepeatNode(nodeData);
         nodeData = filtNodeMarks(nodeData);
         nodeData = compileNodeMarks(nodeData);
-        $mvc.console('log', 'Template Repeats : ' + nodeData.nodeRepeats.length, '#69f');
-        $mvc.console('log', 'Template Marks : ' + nodeData.nodeMarks.length, '#69f');
-        $mvc.console('timeEnd', 'Elapsed Time');
-        $mvc.console('groupEnd', '$mvc compile');
+        $mvc.console('log', 'Template Repeats : ' + nodeData.nodeRepeats.length, '#69f', 5);
+        $mvc.console('log', 'Template Marks : ' + nodeData.nodeMarks.length, '#69f', 5);
+        $mvc.console('timeEnd', 'Elapsed Time', 5);
+        $mvc.console('groupEnd', '$mvc compile', 5);
         return nodeData;
     };
 
@@ -320,7 +339,7 @@
                                         compileHTML = compileHTML + tempHTML;
                                     }
                                 } else {
-                                    $mvc.debug ? console.warn(tempRepeat.repeatMark + ' is not Array!') : null;
+                                    $mvc.console('warn', tempRepeat.repeatMark + ' is not Array!', null, 1);
                                 }
                                 node.childNodes[i].innerHTML = compileHTML;
                                 mapChildFindRepeat(node.childNodes[i], tier + 1);
@@ -365,17 +384,11 @@
                 htmlStr = htmlStr.replace(mapedMarks[i], '');
             }
         }
-        nodeData.node.innerHTML = htmlStr;
+        if (nodeData.node.innerHTML !== htmlStr) {
+            nodeData.node.innerHTML = htmlStr;
+        }
         return nodeData;
     };
 
-    function EXPORTS() {
-        if (typeof(window) !== undefined) {
-            var Global = window;
-        } else {
-            var Global = global;
-        }
-        Global.$mvc = $mvc;
-    }
-    EXPORTS();
-})();
+    root.$mvc = $mvc;
+})(this);
