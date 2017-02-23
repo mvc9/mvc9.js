@@ -33,3 +33,7 @@ body {
 .main-rect .box .content button:hover {
   background-color: #33e933;
 }
+.main-rect .box .content .icon_medium {
+  width: 80px;
+  height: auto;
+}
