@@ -366,19 +366,19 @@
         var mapedMarks = nodeData.nodeMarks;
         var mark3LRegex = new RegExp('{{{');
         var mark3RRegex = new RegExp('}}}');
-        var markFixRegex = [new RegExp('{', 'g'), new RegExp('}', 'g'), new RegExp('=""', 'g'), new RegExp('<', 'g'), new RegExp('>', 'g')];
+        var markFixRegex = [new RegExp('{', 'g'), new RegExp('}', 'g'), new RegExp('<', 'g'), new RegExp('>', 'g'), new RegExp('}}=""', 'g'), new RegExp('\"', 'g'),];
         var tempMark;
         var tempStr;
         var isTrueElement;
         for (var i = 0; i < mapedMarks.length; i++) {
             isTrueElement = mark3LRegex.test(mapedMarks[i]) && mark3RRegex.test(mapedMarks[i]);
+            htmlStr = htmlStr.replace(markFixRegex[4], '}}');
             tempMark = mapedMarks[i].replace(markFixRegex[0], '');
             tempMark = tempMark.replace(markFixRegex[1], '');
-            tempMark = tempMark.replace(markFixRegex[2], '');
             if (eval('typeof(' + tempMark + ')') != 'undefined') {
                 tempStr = String(eval(tempMark));
-                isTrueElement ? null : tempStr = tempStr.replace(markFixRegex[3], '&#60;');
-                isTrueElement ? null : tempStr = tempStr.replace(markFixRegex[4], '&#62;');
+                isTrueElement ? null : tempStr = tempStr.replace(markFixRegex[2], '&#60;');
+                isTrueElement ? null : tempStr = tempStr.replace(markFixRegex[3], '&#62;');
                 htmlStr = htmlStr.replace(mapedMarks[i], tempStr);
             } else {
                 htmlStr = htmlStr.replace(mapedMarks[i], '');
