@@ -63,13 +63,13 @@
         }
     }
 
-    /*=====  Single Ajax  =====*/
-    $mvc.sAjaxSequence = [];
+    /*=====  example httpCom(AJAX)  =====*/
+    $mvc.httpComSequence = [];
     /*  @description single AJAX request.
      *  @param {Object} param
      *  @return {Object} param
      *
-     *  *** how to use $mvc.sAjax ***
+     *  *** how to use $mvc.httpCom ***
      *
      *  var param = { * "name": 'request1',
      *      "url": 'www.mvc9.com/api/1',
@@ -82,13 +82,13 @@
      *      "delay": 100 // (ms) { after request finished 100 ms, unlock this requset. },
      *      "finishCallback": function(status, response) { * your code * } *
      *  }; 
-     *  $mvc.sAjax(param);
+     *  $mvc.httpCom(param);
      */
 
-    $mvc.sAjax = function(param) {
+    $mvc.httpCom = function(param) {
         param = {
             "name": param.name || 'null',
-            "crackCallback": param.crackCallback || function(name) { console.warn('sAjax(name:' + name + ') is canceled because of an unfinished same sAjax!'); },
+            "crackCallback": param.crackCallback || function(name) { console.warn('httpCom(name:' + name + ') is canceled because of an unfinished same httpCom!'); },
             "url": param.url || window.location.href,
             "method": param.method || 'GET',
             "header": param.header || {},
@@ -122,16 +122,16 @@
             }
         }
         if (!param.name) {
-            console.error('$mvc.sAjax param.name can not be omitted!');
+            console.error('$mvc.httpCom param.name can not be omitted!');
             return;
         } else {
-            for (var m = 0; m < $mvc.sAjaxSequence.length; m++) {
-                if ($mvc.sAjaxSequence[m] == param.name) {
+            for (var m = 0; m < $mvc.httpComSequence.length; m++) {
+                if ($mvc.httpComSequence[m] == param.name) {
                     param.crackCallback(param.name);
                     return;
                 }
             }
-            $mvc.sAjaxSequence.push(param.name);
+            $mvc.httpComSequence.push(param.name);
         }
         var xmlHttp = null;
         xmlHttp = GetXmlHttpObject();
@@ -149,9 +149,9 @@
 
         function stateChanged() {
             if (xmlHttp.readyState == 4) {
-                for (var i = 0; i < $mvc.sAjaxSequence.length; i++) {
+                for (var i = 0; i < $mvc.httpComSequence.length; i++) {
                     setTimeout(function() {
-                        $mvc.sAjaxSequence = $mvc.sAjaxSequence.slice(0, (i - 1)).concat($mvc.sAjaxSequence.slice(i, ($mvc.sAjaxSequence.length - 1)));
+                        $mvc.httpComSequence = $mvc.httpComSequence.slice(0, (i - 1)).concat($mvc.httpComSequence.slice(i, ($mvc.httpComSequence.length - 1)));
                     }, param.delay);
                 }
                 param.finishCallback(xmlHttp.status, xmlHttp.responseText);

@@ -13,9 +13,9 @@ var connect = require('gulp-connect');
 //是否执行开发模式编译;=true不会压缩js/css;
 var developmentMode = true;
 //开发源路径根目录
-var examplesSrcBaseDir = "./examples/src";
+var examplesSrcBaseDir = "./tutorial/src";
 //项目编译路径根目录
-var examplesBuildBaseDir = "./examples/build";
+var examplesBuildBaseDir = "./tutorial/build";
 
 var config = {
     //MVC9 Src

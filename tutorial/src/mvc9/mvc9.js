@@ -5,7 +5,7 @@
     var root = {};
     var $mvc = {
         "name": "mvc9.js(mvc9.com)",
-        "version": "1.0.0",
+        "version": "0.9.1 Beta",
         "logLevel": 0
     };
     $mvc.isNodeRuntime = !Boolean(top.location);
@@ -299,7 +299,7 @@
         nodeData.node.className ? $mvc.console('log', 'Template Element Class : ' + nodeData.node.className, '#69f', 5) : null;
         $mvc.console('time', 'Elapsed Time');
         $mvc.mapNode.restore(name, nodeData);
-        nodeData = mapRepeatNode(nodeData);
+        nodeData = filtRepeatNode(nodeData);
         nodeData = filtNodeMarks(nodeData);
         nodeData = compileNodeMarks(nodeData);
         $mvc.console('log', 'Template Repeats : ' + nodeData.nodeRepeats.length, '#69f', 5);
@@ -309,7 +309,7 @@
         return nodeData;
     };
 
-    function mapRepeatNode(nodeData) {
+    function filtRepeatNode(nodeData) {
         mapChildFindRepeat(nodeData.node, 0);
 
         function mapChildFindRepeat(node, tier) {

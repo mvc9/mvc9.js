@@ -8,7 +8,7 @@
     "type": "",
     "url": ""
   },
-  "main": "",
+  "main": "src/mvc9.js",
   "dependencies": {
     "gulp": "^3.9.1",
     "gulp-connect": "^4.1.0",
