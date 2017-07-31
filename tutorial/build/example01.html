@@ -14,28 +14,29 @@
     	<div class="title">
         	<h2>Example01</h2>
         </div>
-        <div class="box" mvc-template="part1">
+        <div class="box" x-render="part-1">
         	<div class="part">PART 1 :</div>
         	<div class="content">{{'hello world!'}}</div>
         </div>
-        <div class="box" mvc-template="part2">
+        <div class="box" x-render="part-2">
         	<div class="part">PART 2 :</div>
         	<div class="content">{{m.part2Data}}</div>
         </div>
-        <div class="box" mvc-template="part3">
+        <div class="box" x-render="part-3">
         	<div class="part">PART 3 :</div>
         	<div class="content">{{m.part3Data}}</div>
         </div>
-        <div class="box" mvc-template="part4">
+        <div class="box" x-render="part-4">
         	<div class="part">PART 4 :</div>
         	<div class="content">{{m.part4Data(100)}}</div>
         </div>
-        <div class="box" mvc-template="part5">
+        <div class="box" x-render="part-5">
         	<div class="part">PART 4 :</div>
-        	<div class="content">
+        	<div class="content" x-render="repeat-1">
+                <div class="content">RenderPath: {{"['$path']"}}</div>
         		<div>You Select : {{m.part5Select}}</div>
         		<div style="height:{{5}}px"></div>
-        		<div mvc-repeat="m.part5Data">
+        		<div x-repeat="m.part5Data">
         			<button onclick="c.fruitBtnClick($0)">{{m.part5Data[$0]}}</button>
         		</div>
         	</div>
