@@ -14,6 +14,7 @@
   root.v = { "description": "View renderScope Property" };
   root.c = { "description": "Control Property" };
   $mvc.root = root;
+  if ($mvc.root.$x) { return null; }
 
   /*  @description display console messages when $mvc.mode='dev';
    *  @param {String} command log,time,timeEnd,group,groupEnd
@@ -184,6 +185,7 @@
     function afterLoadFn() {
       fn();
       if (doCompile) {
+        $mvc.mapNode.rootNode = document;
         $mvc.mapNode.mapRenderToMold(document);
         $mvc.mapNode.renderScopePath();
         $mvc.mapNode.molds = [];
@@ -205,17 +207,41 @@
     }
   };
 
-  /*=====  Map Node MVC  =====*/
+  /*=====  RegExp  =====*/
   $mvc.regex = {};
   $mvc.regex.nodeMark = new RegExp('{{2,3}[^{}]*}{2,3}', 'g');
   $mvc.regex.HTMLMark = new RegExp('<html>(.*\s)*</html>');
   $mvc.regex.scopePathMark = new RegExp('\\$path', 'g');
+  $mvc.regex.isReaptTier = new RegExp('\\$\\d+');
+  
+  /*=====  Map Node MVC  =====*/
   $mvc.mapNode = {};
   $mvc.mapNode.molds = [];
+  $mvc.mapNode.emptyDom = function () {
+    return {
+      childNodes: [],
+      innerHTML: ''
+    }
+  };
+  $mvc.isNodeRuntime ? $mvc.mapNode.rootNode = new $mvc.mapNode.emptyDom() : $mvc.mapNode.rootNode = document;
+
+  $mvc.init = function () {
+    delete $mvc.mapNode.rootNode;
+    delete $mvc.mapNode.molds;
+    delete $mvc.root.m;
+    delete $mvc.root.v;
+    delete $mvc.root.c;
+    $mvc.mapNode.rootNode = new $mvc.mapNode.emptyDom();
+    $mvc.mapNode.molds = [];
+    $mvc.root.m = { "description": "Model Data Property" };
+    $mvc.root.v = { "description": "View renderScope Property" };
+    $mvc.root.c = { "description": "Control Property" };
+  }
 
   $mvc.mapNode.mapNodeByAttributeName = function (node, attributeName, path, matchTask) {
+    node = node || $mvc.mapNode.emptyDom;
     //map current node child
-    for (var i = 0; i < node.childNodes.length; i++) {
+    for (var i = 0; i < (node.childNodes || []).length; i++) {
       //if this child is not a text
       if (node.childNodes[i].attributes) {
         //map current child attribute
@@ -262,15 +288,19 @@
       }
     };
     $mvc.mapNode.mapNodeByAttributeName(node, 'x-include', null, matchTask);
+    return node;
   }
 
+  /*  @decscription auto make x-render into a mold;
+   *    Caution:Make sure you don't make a dom into mold twice!
+   */
   $mvc.mapNode.mapRenderToMold = function (node) {
     var matchTask = function (node, includePath, path) {
       var renderScopeName = node.attributes['x-render']['value'];
       var scopePath = path.join('"').match(/[^\"]+/g) || [];
       scopePath.push(renderScopeName);
       node.setAttribute('x-path', scopePath.join('.'));
-      $mvc.mapNode.mold(renderScopeName, node, scopePath);
+      $mvc.regex.isReaptTier.test(renderScopeName) ? null : $mvc.mapNode.mold(renderScopeName, node, scopePath);
       $mvc.mapNode.mapNodeByAttributeName(node, 'x-render', scopePath, matchTask);
     }
     $mvc.mapNode.mapNodeByAttributeName(node, 'x-render', [], matchTask);
@@ -283,16 +313,6 @@
     }
   }
 
-  /*  @decscription auto make x-render into a mold;
-   *    Caution:this function will clear all mold you have make!
-   */
-  $mvc.mapNode.autoMold = function () {
-    var mvcrenderScopeNodes = $mvc.mapNode.getElementsByAttributeName(document, 'x-render');
-    for (var n = 0; n < mvcrenderScopeNodes.length; n++) {
-      $mvc.mapNode.mold(mvcrenderScopeNodes[n].attributes['x-render']['value'], mvcrenderScopeNodes[n]);
-    }
-  }
-
   /*  @description Generate a marked html dom into a mvcNodeMold.
    *  @param {Node} HTMLCollection
    *  @return {Object} mvcNodeMold
@@ -300,7 +320,7 @@
   $mvc.mapNode.mold = function (name, node, path, beforeCompile, afterCompile) {
     $mvc.mapNode.molds.push({
       "name": name,
-      "node": node || document.body,
+      "node": node,
       "path": path || [],
       "nodeMarks": [],
       "nodeRepeats": [],
@@ -325,6 +345,7 @@
   function restore(nodeData) {
     nodeData.nodeMarks = [];
     nodeData.nodeRepeats = [];
+    nodeData.node = nodeData.node || {};
     nodeData.node.innerHTML = nodeData.sourceHTML;
     return nodeData;
   };
@@ -348,7 +369,7 @@
   }
 
   function compile(renderScopePath, nodeData, rootNode) {
-    rootNode = rootNode || document;
+    rootNode = rootNode || $mvc.mapNode.rootNode;
     $mvc.console('group', '$mvc compile', 5);
     $mvc.console('log', 'renderScope Name : ' + nodeData.name, '#33f', 5);
     $mvc.console('log', 'renderScope Path : ' + nodeData.path.join(' -> '), '#69f', 5);
@@ -361,6 +382,9 @@
     nodeData = mapRepeatNode(nodeData);
     nodeData = filtNodeMarks(nodeData);
     nodeData = compileNodeMarks(nodeData);
+    $mvc.isNodeRuntime ? nodeData.node.removeAttribute('x-include') : null;
+    $mvc.isNodeRuntime ? nodeData.node.removeAttribute('x-render') : null;
+    $mvc.isNodeRuntime ? nodeData.node.removeAttribute('x-path') : null;
     $mvc.console('log', 'renderScope Repeats : ' + nodeData.nodeRepeats.length, '#69f', 5);
     $mvc.console('log', 'renderScope Marks : ' + nodeData.nodeMarks.length, '#69f', 5);
     $mvc.console('timeEnd', 'Elapsed Time', 5);
@@ -396,7 +420,7 @@
   }
 
   function filtNodeMarks(nodeData) {
-    nodeData.nodeMarks = nodeData.node.innerHTML.match($mvc.regex.nodeMark) || [];
+    nodeData.nodeMarks = (nodeData.node.innerHTML || '').match($mvc.regex.nodeMark) || [];
     return nodeData;
   }
 
