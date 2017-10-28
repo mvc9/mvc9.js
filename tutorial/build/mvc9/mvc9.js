@@ -5,7 +5,7 @@
   var root = {};
   var $mvc = {
     "name": "mvc9.js(mvc9.com)",
-    "version": "1.2.0",
+    "version": "1.2.1",
     "logLevel": 0
   };
   $mvc.isNodeRuntime = !Boolean(top.location);
@@ -14,7 +14,7 @@
   root.v = { "description": "View renderScope Property" };
   root.c = { "description": "Control Property" };
   $mvc.root = root;
-  if ($mvc.root.$x) { return null; }
+  if ($mvc.root.$x) { return $mvc.root.$x; }
 
   /*  @description display console messages when $mvc.mode='dev';
    *  @param {String} command log,time,timeEnd,group,groupEnd
@@ -454,4 +454,5 @@
   };
 
   root.$x = $mvc;
+  return $mvc;
 })(this);
